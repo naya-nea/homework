@@ -1,0 +1,129 @@
+import operator
+from random import randrange
+import time
+
+from datetime import datetime
+
+
+# Sorting our array using a merge sort
+def mergeSort(array):
+    if len(array) < 2: return array
+
+    result, mid = [], int(len(array) / 2)
+
+    left = mergeSort(array[:mid])
+    right = mergeSort(array[mid:])
+
+    while (len(left) > 0) and (len(right) > 0):
+        if left[0] > right[0]:
+            result.append(right.pop(0))
+        else:
+            result.append(left.pop(0))
+
+    result.extend(left + right)
+    return result
+
+
+# Creating a heapify for a future sort
+def heapify(array, length, i):
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+
+    if left < length and array[i] < array[left]:
+        largest = left
+
+    if right < length and array[largest] < array[right]:
+        largest = right
+
+    if largest != i:
+        array[i], array[largest] = array[largest], array[i]
+        heapify(array, length, largest)
+
+
+# Sorting created heapify array
+def heapSort(array):
+    length = len(array)
+
+    for i in range(length, -1, -1):
+        heapify(array, length, i)
+
+    for i in range(length - 1, 0, -1):
+        array[i], array[0] = array[0], array[i]
+        heapify(array, i, 0)
+    return array
+
+
+# Using a quick sort for an array
+def quickSort(array):
+    less = []
+    equal = []
+    greater = []
+
+    if len(array) > 1:
+        pivot = array[0]
+        for number in array:
+            if number < pivot:
+                less.append(number)
+            elif number == pivot:
+                equal.append(number)
+            elif number > pivot:
+                greater.append(number)
+        return quickSort(less) + equal + quickSort(greater)
+    else:
+        return array
+
+
+# Opening text file "ai182" in a read mode
+file = open("ai182.txt", "r")
+someArray = []
+
+firstTestCheck = False
+secondTestCheck = False
+
+# Using a cycle to find the correct array(11)
+while True:
+    check = file.read(1)
+    if not check:
+        break
+
+    if check == "1":
+        check = file.read(1)
+        if check == '1':
+            firstTestCheck = True
+            check = file.read(1)
+            if check == ":":
+                secondTestCheck = True
+
+    if firstTestCheck == True and secondTestCheck == True:
+        file.seek(file.tell() + 1)
+        check = file.read(1)
+        while check != "}":
+            someArray.append(int(check))
+            check = file.read(1)
+        break
+
+# Close file ai182.txt
+file.close()
+
+# Merge sort has Duration: ~0:00:00.000275 (most of the time)
+startTime = datetime.now()
+print(mergeSort(someArray))
+endTime = datetime.now()
+print('Duration: {}'.format(endTime - startTime))
+
+# Heap sort has Duration: ~0:00:00.000175 (sometimes it tales even less time)
+startTime = datetime.now()
+print(heapSort(someArray))
+endTime = datetime.now()
+print('Duration: {}'.format(endTime - startTime))
+
+# Quick sort has Duration: ~0:00:00.000126
+startTime = datetime.now()
+print(quickSort(someArray))
+endTime = datetime.now()
+print('Duration: {}'.format(endTime - startTime))
+
+# Duration of all three sorts is pretty low, as all of them are logarithmic.
+# Quick sort seem's to be the fastes one, but it's mostly random and ca be the slowwest one as well.
+# Heap sort in the most of the cases is the fastes one, as it does less operations then any other sort.
